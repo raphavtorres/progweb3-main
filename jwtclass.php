@@ -18,37 +18,44 @@ class myJWT {
       $signature = base64_encode($signature);
 
       $token = "$header.$payload.$signature";
-
-      $sql = "insert into token (hashToken, idUser) values ('". $token ."',". $idU .")"; 
-      $resultadoQuery = mysqli_query($conn, $sql);
       
       return $token;
    }
-    
-   public function validaToken($conn, $tk, $idU){
+
+   public function validaToken($conn, $rtk){
       //dividindo token e colocando partes em indices array
-      $arrayPartesToken = explode(".",$tk);
-      $vheader = $arrayPartesToken[0];
-      $vpayload = $arrayPartesToken[1];
-      $vsignature = $arrayPartesToken[2];
-      
-      $signatureCheck = hash_hmac('sha256', "$vheader.$vpayload", $this->senha, true);
-    /* $signatureCheck = hash_hmac('sha256', "f", $this->senha, true); */ /*para invalidar token*/
-      
-      $signatureCheck = base64_encode($signatureCheck);
-      
-      if ($vsignature == $signatureCheck){
-         $retorno = true;
-      }else {
-         $retorno = false;
-         $sql = "delete from token where idUser = ". $idU; 
-         $resultadoQuery = mysqli_query($conn, $sql);
-         $this->criaToken($conn, $vpayload, $idU);
+
+      $arrayPartesToken = explode(".", $rtk);
+      $headerRt = $arrayPartesToken[0];
+      $payloadRt = $arrayPartesToken[1];
+      $signatureRt = $arrayPartesToken[2];
+     
+      $signatureCheckRt = hash_hmac('sha256', "$headerRt.$payloadRt", $this->senha, true);
+      $signatureCheckRt = base64_encode($signatureCheckRt);
+     
+      $payloadRt = base64_decode($payloadRt);
+      $payloadRt = json_decode($payloadRt, true);
+      $idU = $payloadRt['idU'];
+      $dtExp = $payloadRt['dtexp'];
+      $ctg = $payloadRt['categoria'];
+      if ($ctg == 'refresh') {
+         if($dtExp >= time() && $signatureRt == $signatureCheckRt){ // data de expiração válida
+            $retorno = true;
+         }else {
+            $retorno = false;
+            $sql = "delete from token where idUser = ". $idU;
+            $resultadoQuery = mysqli_query($conn, $sql);
+            /* $refresh = $this->criaToken($conn, $payloadRt, $idU);
+            $access = $this->criaToken($conn, $payloadAccess, $idU);
+            $sql = "insert into token (accessToken, refreshToken, idUser) values ('". $access ."','". $refresh ."','". $idU ."')"; 
+            $resultadoQuery = mysqli_query($conn, $sql);*/
+         }
+         return $retorno;
+      }else{
+         echo 'Insira um refreshToken!';
       }
       
-      return $retorno;
+      
    }
-
-
 }
 ?>

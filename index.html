@@ -9,8 +9,18 @@
 <body>
     <form action="receive_form.php" method="POST">
         <div>Digite o usuario: <input type="text" name="usuario" id=""></div> <br>
-        Senha: <input type="password" name="senha" id=""> <br>
+        <div>Senha: <input type="password" name="senha" id=""></div>
+        <br>
         <button type="submit">Entrar</button>
+
+    </form>
+    <br>
+    <form action="verificarToken.php" method="POST"> 
+    <!-- <div>Validar Access Token <br><textarea name="txt_access" id="" cols="80" rows="3"></textarea></div> -->
+    
+    <div>Validar Refresh Token <br><textarea name="txt_refresh" id="" cols="80" rows="3"></textarea></div>
+    <button type="submit">Validar</button>
     </form>
 </body>
+
 </html>

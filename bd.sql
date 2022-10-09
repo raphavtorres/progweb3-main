@@ -13,7 +13,8 @@ ALTER TABLE usuario MODIFY COLUMN idUser INT(3) AUTO_INCREMENT;
 
 CREATE TABLE token (
     idToken INT(3) AUTO_INCREMENT,
-    hashToken VARCHAR(200) NOT NULL,
+    accessToken VARCHAR(200) NOT NULL,
+    refreshToken VARCHAR(200) NOT NULL,
     idUser INT(3),
     PRIMARY KEY (idToken),
     FOREIGN KEY (idUser) REFERENCES usuario (idUser)
